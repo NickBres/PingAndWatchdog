@@ -67,8 +67,10 @@ int main(int argc, char *argv[])
         int pid = fork();
         if (pid == 0)
         {
-            execvp(args[0], args);
+            //execvp(args[0], args); // not working because process doesnt return back
+            timer(5);
             printf("server %s cannot be reached\n", ip);
+            kill(0, SIGKILL);
         }
         else
         {
@@ -87,6 +89,7 @@ int main(int argc, char *argv[])
             bzero(packet, IP_MAXPACKET);
             socklen_t len = sizeof(dest_in);
             ssize_t bytes_received = -1;
+            
             while ((bytes_received = recvfrom(sock, packet, sizeof(packet), 0, (struct sockaddr *)&dest_in, &len)))
             {
                 if (bytes_received > 0)
@@ -113,7 +116,6 @@ int main(int argc, char *argv[])
             sleep(1); // wait 1 second to send next packet. looks better in terminal
         }
     }
-
     close(sock);
     return 0;
 }
@@ -182,25 +184,4 @@ void timer(int sec){
             break;
         }
     }
-    printf("Timer is up!\n");
 }
-
-// run 2 programs using fork + exec
-// command: make clean && make all && ./partb
-// int main()
-// {
-//     char *args[2];
-//     // compiled watchdog.c by makefile
-//     args[0] = "./watchdog";
-//     args[1] = NULL;
-//     int status;
-//     int pid = fork();
-//     if (pid == 0)
-//     {
-//         printf("in child \n");
-//         execvp(args[0], args);
-//     }
-//     wait(&status); // waiting for child to finish before exiting
-//     printf("child exit status is: %d", status);
-//     return 0;
-// }

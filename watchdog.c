@@ -1,4 +1,3 @@
-#include <stdio.h>
 
 #include <stdio.h>
 #include <sys/time.h>
@@ -18,7 +17,7 @@ int main(void)
             break;
         }
     }
-    printf("Timer is up!\n");
+    printf("time out\n");
     return 0;
 }
 
