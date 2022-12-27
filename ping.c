@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     int count = 0;
     char packet[IP_MAXPACKET];
 
-    while (count < 10)
+    while (1)
     {
 
         int packetlen = createPacket(packet, count); // create icmp packet
@@ -99,6 +99,7 @@ int main(int argc, char *argv[])
 
         count++;
         bzero(packet, IP_MAXPACKET);
+        sleep(1); // wait 1 second to send next packet. looks better in terminal
     }
 
     close(sock);
