@@ -16,14 +16,12 @@
 #define IP4_HDRLEN 20
 #define ICMP_HDRLEN 8
 
-#define SOURCE_IP "1.1.1.1"              // my ip-address
 
 unsigned short calculate_checksum(unsigned short *paddress, int len);
 int createPacket(char *packet, int seq); // create icmp packet return packet length
 
 int main(int argc, char *argv[])
 {
-
     if (argc != 2)
     {
         printf("Usage: ./parta <ip-address>\n");
@@ -123,8 +121,7 @@ int createPacket(char *packet, int seq)
     memcpy(packet + ICMP_HDRLEN, data, datalen); // add ICMP data to packet
 
     icmphdr.icmp_cksum = calculate_checksum((unsigned short *)(packet), ICMP_HDRLEN + datalen); // calculate checksum
-    memcpy((packet), &icmphdr, ICMP_HDRLEN);                                                    // add ICMP header with checksum to packet
-    // memcpy((packet) + 2, &icmphdr.icmp_cksum, 1);
+    memcpy((packet), &icmphdr, ICMP_HDRLEN);         
 
     return ICMP_HDRLEN + datalen;
 }
