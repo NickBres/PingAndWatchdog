@@ -16,23 +16,36 @@
 #define IP4_HDRLEN 20
 #define ICMP_HDRLEN 8
 
-#define SOURCE_IP "1.1.1.1" // my ip-address
-#define DESTINATION_IP "142.250.200.206" // google.com one of their ip-addresses
+#define SOURCE_IP "1.1.1.1"              // my ip-address
 
 unsigned short calculate_checksum(unsigned short *paddress, int len);
 int createPacket(char *packet, int seq); // create icmp packet return packet length
 
-int main()
+int main(int argc, char *argv[])
 {
-    int count = 0;
-    char packet[IP_MAXPACKET];
+
+    if (argc != 2)
+    {
+        printf("Usage: ./parta <ip-address>\n");
+        return 0;
+    }
+
+    char ip[INET_ADDRSTRLEN];
+    strcpy(ip, argv[1]);
+    struct in_addr addr;
+    if (inet_pton(AF_INET, ip, &addr) != 1)
+    {
+        printf("Invalid ip-address\n");
+        return 0;
+    }
+
+    printf("Pinging %s:\n", ip);
 
     struct sockaddr_in dest_in;
     memset(&dest_in, 0, sizeof(struct sockaddr_in));
     dest_in.sin_family = AF_INET;
 
-
-    dest_in.sin_addr.s_addr = inet_addr(DESTINATION_IP);
+    dest_in.sin_addr.s_addr = inet_addr(ip);
 
     // Create raw socket for IP-RAW-ICMP
     int sock = -1;
@@ -42,6 +55,10 @@ int main()
         fprintf(stderr, "To create a raw socket, the process needs to be run by Admin/root user.\n\n");
         return -1;
     }
+
+    int count = 0;
+    char packet[IP_MAXPACKET];
+
     while (count < 10)
     {
 
@@ -73,13 +90,12 @@ int main()
         gettimeofday(&end, 0);
 
         char reply[IP_MAXPACKET];
-        memcpy(reply, packet + ICMP_HDRLEN + IP4_HDRLEN, packetlen - ICMP_HDRLEN);// get reply data from packet
+        memcpy(reply, packet + ICMP_HDRLEN + IP4_HDRLEN, packetlen - ICMP_HDRLEN); // get reply data from packet
 
         float milliseconds = (end.tv_sec - start.tv_sec) * 1000.0f + (end.tv_usec - start.tv_usec) / 1000.0f;
         unsigned long microseconds = (end.tv_sec - start.tv_sec) * 1000.0f + (end.tv_usec - start.tv_usec);
         float time = (end.tv_sec - start.tv_sec) * 1000.0f + (end.tv_usec - start.tv_usec) / 1000.0f;
-        printf("%d bytes from %s: seq: %d time: %0.3fms data: %s",bytes_received, DESTINATION_IP, count, time, reply);
-
+        printf("    %d bytes from %s: seq: %d time: %0.3fms\n", bytes_received, ip, count, time);
 
         count++;
         bzero(packet, IP_MAXPACKET);
