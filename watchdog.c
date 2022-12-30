@@ -1,8 +1,9 @@
 
 #include <stdio.h>
 #include <sys/time.h>
+#include <signal.h>
 
-int main(void)
+int main(int argc, char *argv[])
 {
     struct timeval start, end;
     long elapsed;
@@ -17,8 +18,10 @@ int main(void)
             break;
         }
     }
-    printf("time out\n");
+    printf("server can't be reached\n");
+    kill(0,SIGINT);
     return 0;
 }
+
 
 

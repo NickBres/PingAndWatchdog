@@ -53,7 +53,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "To create a raw socket, the process needs to be run by Admin/root user.\n\n");
         return -1;
     }
-
     int count = 0;
     char packet[IP_MAXPACKET];
 

@@ -22,6 +22,7 @@ int createPacket(char *packet, int seq); // create icmp packet return packet len
 
 int main(int argc, char *argv[])
 {
+
     if (argc != 2)
     {
         printf("Usage: ./parta <ip-address>\n");
@@ -37,7 +38,10 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    printf("Pinging %s:\n", ip);
+    int count = 0;
+    char packet[IP_MAXPACKET];
+    int packetlen = createPacket(packet, count);
+    printf("PING %s: %d data bytes\n", ip, packetlen - ICMP_HDRLEN);
 
     struct sockaddr_in dest_in;
     memset(&dest_in, 0, sizeof(struct sockaddr_in));
@@ -54,9 +58,6 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    int count = 0;
-    char packet[IP_MAXPACKET];
-
     char *args[2];
     // compiled watchdog.c by makefile
     args[0] = "./watchdog";
@@ -67,10 +68,7 @@ int main(int argc, char *argv[])
         int pid = fork();
         if (pid == 0)
         {
-            //execvp(args[0], args); // not working because process doesnt return back
-            timer(5);
-            printf("server %s cannot be reached\n", ip);
-            kill(0, SIGKILL);
+            execvp(args[0], args);
         }
         else
         {
@@ -89,7 +87,7 @@ int main(int argc, char *argv[])
             bzero(packet, IP_MAXPACKET);
             socklen_t len = sizeof(dest_in);
             ssize_t bytes_received = -1;
-            
+
             while ((bytes_received = recvfrom(sock, packet, sizeof(packet), 0, (struct sockaddr *)&dest_in, &len)))
             {
                 if (bytes_received > 0)
@@ -168,20 +166,4 @@ unsigned short calculate_checksum(unsigned short *paddress, int len)
     answer = ~sum;                      // truncate to 16 bits
 
     return answer;
-}
-
-void timer(int sec){
-    struct timeval start, end;
-    long elapsed;
-    gettimeofday(&start, NULL);
-
-    while (1)
-    {
-        gettimeofday(&end, NULL);
-        elapsed = (end.tv_sec - start.tv_sec) * 1000 + (end.tv_usec - start.tv_usec) / 1000;
-        if (elapsed >= sec * 1000)
-        {
-            break;
-        }
-    }
 }
