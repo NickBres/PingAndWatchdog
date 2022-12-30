@@ -13,13 +13,13 @@ int main(int argc, char *argv[])
     {
         gettimeofday(&end, NULL);
         elapsed = (end.tv_sec - start.tv_sec) * 1000 + (end.tv_usec - start.tv_usec) / 1000;
-        if (elapsed >= 5000)
+        if (elapsed >= 10000) // ten seconds
         {
             break;
         }
     }
     printf("server can't be reached\n");
-    kill(0,SIGINT);
+    kill(0,SIGINT); // kill all processes in the process group
     return 0;
 }
 

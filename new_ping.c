@@ -65,10 +65,10 @@ int main(int argc, char *argv[])
 
     while (1)
     {
-        int pid = fork();
+        int pid = fork(); // fork a child process for watchdog
         if (pid == 0)
         {
-            execvp(args[0], args);
+            execvp(args[0], args); // execute watchdog
         }
         else
         {
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
                 }
             }
             gettimeofday(&end, 0);
-            kill(pid, SIGKILL);
+            kill(pid, SIGKILL); // kill watchdog process
 
             char reply[IP_MAXPACKET];
             memcpy(reply, packet + ICMP_HDRLEN + IP4_HDRLEN, packetlen - ICMP_HDRLEN); // get reply data from packet
